@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PadelKu — Booking Lapangan Padel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --bg: oklch(0.11 0.02 250); --surface: oklch(0.18 0.025 245);
+    --lime: oklch(0.88 0.26 128); --cyan: oklch(0.72 0.18 200);
+    --gold: oklch(0.82 0.18 75); --text: oklch(0.96 0.005 250);
+    --text-muted: oklch(0.60 0.02 250); --border: oklch(0.25 0.025 245);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: linear-gradient(to bottom, oklch(0.11 0.02 250 / 0.95), transparent); backdrop-filter: blur(12px); animation: fadeDown 0.8s ease both; }
+  .logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: -0.5px; color: var(--text); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 12px var(--lime); animation: pulse 2s ease infinite; }
+  .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+  .nav-links a { text-decoration: none; color: var(--text-muted); font-size: 14px; font-weight: 500; transition: color 0.2s; cursor: pointer; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta { background: var(--lime); color: var(--bg); border: none; border-radius: 100px; padding: 10px 24px; font-size: 14px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 0 20px oklch(0.88 0.26 128 / 0.3); }
+  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 0 30px oklch(0.88 0.26 128 / 0.5); }
+
+  .hero { position: relative; min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 0 48px; overflow: hidden; gap: 48px; }
+  .hero::before { content: ''; position: absolute; inset: 0; background-image: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PScwIDAgMjU2IDI1NicgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJz48ZmlsdGVyIGlkPSdub2lzZSc+PGZlVHVyYnVsZW5jZSB0eXBlPSdmcmFjdGFsTm9pc2UnIGJhc2VGcmVxdWVuY3k9JzAuOScgbnVtT2N0YXZlcz0nNCcgc3RpdGNoVGlsZXM9J3N0aXRjaCcvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbHRlcj0ndXJsKCNub2lzZSknIG9wYWNpdHk9JzAuMDM1Jy8+PC9zdmc+"); pointer-events: none; z-index: 1; }
+  .hero-glow { position: absolute; right: -5%; top: 50%; transform: translateY(-50%); width: 700px; height: 700px; border-radius: 50%; background: radial-gradient(circle, oklch(0.88 0.26 128 / 0.08) 0%, transparent 70%); pointer-events: none; }
+  .hero-glow2 { position: absolute; left: 10%; top: 20%; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, oklch(0.72 0.18 200 / 0.06) 0%, transparent 70%); pointer-events: none; }
+  .hero-content { position: relative; z-index: 2; animation: fadeUp 1s ease 0.3s both; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 100px; padding: 6px 14px 6px 8px; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 28px; background: oklch(0.16 0.025 245 / 0.8); backdrop-filter: blur(8px); }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 8px var(--lime); animation: pulse 2s ease infinite; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(42px, 5vw, 68px); font-weight: 700; line-height: 1.05; letter-spacing: -2px; margin-bottom: 24px; }
+  h1 .accent { color: var(--lime); } h1 .thin { font-weight: 300; color: var(--text-muted); }
+  .hero-desc { font-size: 16px; line-height: 1.7; color: var(--text-muted); max-width: 440px; margin-bottom: 36px; }
+  .hero-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .btn-primary { background: var(--lime); color: var(--bg); border: none; border-radius: 100px; padding: 15px 32px; font-size: 15px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 0 30px oklch(0.88 0.26 128 / 0.35); display: flex; align-items: center; gap: 8px; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px oklch(0.88 0.26 128 / 0.55); }
+  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 100px; padding: 14px 28px; font-size: 15px; font-weight: 500; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+  .btn-ghost:hover { border-color: var(--text-muted); background: oklch(0.18 0.025 245); }
+  .hero-stats { display: flex; gap: 32px; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
+  .stat-num { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+  .stat-num span { color: var(--lime); } .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .hero-visual { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; animation: fadeUp 1s ease 0.5s both; }
+  .court-wrapper { position: relative; width: 100%; max-width: 560px; aspect-ratio: 1; }
+  .float-card { position: absolute; background: oklch(0.18 0.025 245 / 0.9); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 16px; padding: 14px 18px; font-size: 13px; font-family: 'Space Grotesk', sans-serif; box-shadow: 0 8px 32px oklch(0 0 0 / 0.4); z-index: 10; animation: floatCard 4s ease infinite; }
+  .fc-available { top: 10%; right: -5%; border-color: oklch(0.88 0.26 128 / 0.3); }
+  .fc-booking { bottom: 20%; left: -8%; animation-delay: -2s; }
+  .fc-member { bottom: 5%; right: 5%; animation-delay: -1s; border-color: oklch(0.72 0.18 200 / 0.3); }
+  .fc-label { font-size: 10px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .fc-value { font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
+  .fc-dot-live { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 8px var(--lime); animation: pulse 1.5s ease infinite; }
+  .fc-dot-cyan { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); }
+  .fc-slots { display: flex; gap: 4px; margin-top: 8px; }
+  .fc-slot { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; }
+  .fc-slot.free { background: oklch(0.88 0.26 128 / 0.15); color: var(--lime); }
+  .fc-slot.taken { background: oklch(0.25 0.02 245); color: var(--text-muted); }
+  .court-svg-container { width: 100%; height: 100%; position: relative; }
+  #court-svg { width: 100%; height: 100%; filter: drop-shadow(0 0 60px oklch(0.88 0.26 128 / 0.15)); }
+  .court-line { stroke: oklch(0.88 0.26 128 / 0.7); stroke-width: 2; fill: none; stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: drawLine 1.5s ease forwards; }
+  .court-outer { animation-delay: 0.2s; } .court-service { animation-delay: 0.6s; }
+  .court-net { animation-delay: 1s; stroke: oklch(0.72 0.18 200 / 0.9); stroke-width: 3; }
+  .court-center { animation-delay: 0.8s; }
+  .court-wall { fill: oklch(0.88 0.26 128 / 0.04); stroke: oklch(0.88 0.26 128 / 0.25); stroke-width: 1.5; animation: fadeIn 1s ease 0.2s both; }
+  .court-bg { fill: oklch(0.16 0.03 160 / 0.5); animation: fadeIn 0.8s ease 0.1s both; }
+  .court-inner-bg { fill: oklch(0.19 0.04 155 / 0.4); animation: fadeIn 0.8s ease 0.3s both; }
+  .ball { fill: var(--lime); filter: drop-shadow(0 0 6px var(--lime)); animation: moveBall 5s ease-in-out infinite; }
+  .ball-trail { fill: none; stroke: oklch(0.88 0.26 128 / 0.2); stroke-width: 1; stroke-dasharray: 4 6; animation: drawLine 2s ease 1.8s forwards; }
+  .scan-line { stroke: oklch(0.88 0.26 128 / 0.4); stroke-width: 1.5; animation: scanLine 4s ease-in-out 1.5s infinite; }
+  .player-dot { animation: pulse 2s ease infinite; }
+  .player-dot.p1 { fill: var(--lime); filter: drop-shadow(0 0 4px var(--lime)); }
+  .player-dot.p2 { fill: var(--lime); filter: drop-shadow(0 0 4px var(--lime)); animation-delay: -0.5s; }
+  .player-dot.p3 { fill: var(--cyan); filter: drop-shadow(0 0 4px var(--cyan)); animation-delay: -1s; }
+  .player-dot.p4 { fill: var(--cyan); filter: drop-shadow(0 0 4px var(--cyan)); animation-delay: -1.5s; }
+  .orbit-ring { fill: none; stroke: oklch(0.88 0.26 128 / 0.08); stroke-width: 1; stroke-dasharray: 8 4; animation: rotateCourt 20s linear infinite; transform-origin: 280px 280px; }
+  .orbit-ring2 { fill: none; stroke: oklch(0.72 0.18 200 / 0.06); stroke-width: 1; stroke-dasharray: 4 8; animation: rotateCourt 30s linear infinite reverse; transform-origin: 280px 280px; }
+
+  /* ── FOOTER ── */
+  .site-footer { background: oklch(0.09 0.018 248); border-top: 1px solid oklch(0.18 0.022 248); padding: 64px 48px 32px; margin-top: 0; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 48px; margin-bottom: 48px; }
+  .footer-brand .logo { margin-bottom: 16px; font-size: 24px; }
+  .footer-tagline { font-size: 14px; color: oklch(0.55 0.02 250); line-height: 1.7; max-width: 280px; margin-bottom: 24px; }
+  .footer-social { display: flex; gap: 10px; }
+  .social-btn { width: 36px; height: 36px; border-radius: 10px; background: oklch(0.16 0.022 248); border: 1px solid oklch(0.22 0.022 248); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; color: oklch(0.55 0.02 250); font-size: 14px; }
+  .social-btn:hover { background: oklch(0.2 0.025 248); border-color: oklch(0.88 0.26 128 / 0.4); color: var(--lime); }
+  .footer-col-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 13px; color: var(--text); margin-bottom: 18px; letter-spacing: 0.3px; }
+  .footer-links { display: flex; flex-direction: column; gap: 10px; }
+  .footer-links a { font-size: 13px; color: oklch(0.55 0.02 250); text-decoration: none; cursor: pointer; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--lime); }
+  .footer-info-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; }
+  .footer-info-icon { width: 30px; height: 30px; border-radius: 8px; background: oklch(0.16 0.022 248); border: 1px solid oklch(0.22 0.022 248); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; }
+  .footer-info-text { font-size: 13px; color: oklch(0.55 0.02 250); line-height: 1.5; }
+  .footer-info-text strong { color: var(--text); font-weight: 500; display: block; margin-bottom: 2px; }
+  .footer-map { border-radius: 14px; overflow: hidden; border: 1px solid oklch(0.22 0.022 248); margin-bottom: 12px; background: oklch(0.14 0.04 160 / 0.5); position: relative; height: 120px; display: flex; align-items: center; justify-content: center; }
+  .footer-map-placeholder { text-align: center; }
+  .footer-bottom { border-top: 1px solid oklch(0.17 0.022 248); padding-top: 24px; display: flex; align-items: center; justify-content: space-between; }
+  .footer-copy { font-size: 12px; color: oklch(0.4 0.02 250); }
+  .footer-badges { display: flex; gap: 8px; }
+  .footer-badge { font-size: 10px; padding: 4px 10px; border-radius: 100px; border: 1px solid oklch(0.22 0.022 248); color: oklch(0.5 0.02 250); font-weight: 500; }
+  .footer-wa-btn { display: flex; align-items: center; gap: 8px; background: oklch(0.07 0.04 145 / 0.25); color: oklch(0.75 0.2 145); border: 1px solid oklch(0.3 0.15 145 / 0.35); border-radius: 100px; padding: 8px 18px; font-size: 13px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+  .footer-wa-btn:hover { background: oklch(0.1 0.04 145 / 0.35); }
+  .hours-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .hours-row { font-size: 12px; color: oklch(0.5 0.02 250); }
+  .hours-row span { color: var(--lime); font-weight: 600; }
+
+  /* Form inputs */
+  .field-input { width: 100%; background: oklch(0.16 0.025 245); border: 1px solid oklch(0.26 0.025 245); border-radius: 10px; padding: 11px 14px; font-size: 14px; color: var(--text); font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
+  .field-input:focus { border-color: oklch(0.88 0.26 128 / 0.6); box-shadow: 0 0 0 3px oklch(0.88 0.26 128 / 0.08); }
+  .field-input::placeholder { color: oklch(0.45 0.02 250); }
+  .field-label { font-size: 12px; font-weight: 600; color: oklch(0.6 0.02 250); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Step indicator */
+  .step-bar { display: flex; align-items: center; gap: 6px; }
+  .step-dot { width: 8px; height: 8px; border-radius: 50%; transition: all 0.3s; }
+  .step-dot.active { background: var(--lime); box-shadow: 0 0 8px var(--lime); width: 24px; border-radius: 4px; }
+  .step-dot.done { background: oklch(0.88 0.26 128 / 0.5); }
+  .step-dot.pending { background: oklch(0.3 0.025 245); }
+
+  /* QR animation */
+  @keyframes qrScan { 0%,100%{transform:translateY(0)} 50%{transform:translateY(120px)} }
+  @keyframes qrPulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.85)} }
+  @keyframes drawLine { to{stroke-dashoffset:0} }
+  @keyframes floatCard { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  @keyframes moveBall { 0%{cx:260;cy:180;r:7} 15%{cx:380;cy:120;r:6} 30%{cx:430;cy:260;r:7} 45%{cx:320;cy:340;r:6.5} 60%{cx:190;cy:400;r:7} 75%{cx:130;cy:280;r:6} 90%{cx:200;cy:150;r:7} 100%{cx:260;cy:180;r:7} }
+  @keyframes rotateCourt { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @keyframes scanLine { 0%{transform:translateY(-100%);opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{transform:translateY(500px);opacity:0} }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  @media(max-width:900px) {
+    .hero{grid-template-columns:1fr;padding:100px 24px 60px;text-align:center;min-height:auto;gap:60px}
+    .hero-desc,.hero-actions,.hero-stats{max-width:100%;justify-content:center}
+    nav{padding:16px 24px} .nav-links{display:none}
+    .footer-grid{grid-template-columns:1fr 1fr;gap:32px} .site-footer{padding:48px 24px 24px}
+    .footer-bottom{flex-direction:column;gap:16px;text-align:center}
+  }
+  @media(max-width:600px){.footer-grid{grid-template-columns:1fr}}
+</style>
+
+<template id="__bundler_thumbnail" data-bg-color="#0f111a">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- Dark background -->
+    <rect width="1200" height="800" fill="#0f111a"/>
+    <!-- Glow -->
+    <ellipse cx="900" cy="400" rx="400" ry="340" fill="#4ade8014" />
+    <!-- Court outline top-down -->
+    <rect x="580" y="140" width="440" height="520" rx="6" fill="#1a2e1a88" stroke="#4ade8044" stroke-width="2"/>
+    <rect x="600" y="158" width="400" height="484" rx="3" fill="none" stroke="#4ade8066" stroke-width="2"/>
+    <line x1="600" y1="400" x2="1000" y2="400" stroke="#22d3ee99" stroke-width="3"/>
+    <line x1="600" y1="268" x2="1000" y2="268" stroke="#4ade8055" stroke-width="1.5"/>
+    <line x1="600" y1="532" x2="1000" y2="532" stroke="#4ade8055" stroke-width="1.5"/>
+    <line x1="800" y1="158" x2="800" y2="268" stroke="#4ade8055" stroke-width="1.5"/>
+    <line x1="800" y1="532" x2="800" y2="642" stroke="#4ade8055" stroke-width="1.5"/>
+    <line x1="800" y1="268" x2="800" y2="400" stroke="#4ade8055" stroke-width="1.5"/>
+    <line x1="800" y1="400" x2="800" y2="532" stroke="#4ade8055" stroke-width="1.5"/>
+    <circle cx="600" cy="400" r="6" fill="#22d3ee"/>
+    <circle cx="1000" cy="400" r="6" fill="#22d3ee"/>
+    <!-- Ball -->
+    <circle cx="860" cy="310" r="10" fill="#4ade80" filter="url(#gb)"/>
+    <defs><filter id="gb"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <!-- Corner dots -->
+    <circle cx="600" cy="158" r="5" fill="#4ade80" opacity="0.9"/>
+    <circle cx="1000" cy="158" r="5" fill="#4ade80" opacity="0.9"/>
+    <circle cx="600" cy="642" r="5" fill="#4ade80" opacity="0.9"/>
+    <circle cx="1000" cy="642" r="5" fill="#4ade80" opacity="0.9"/>
+    <!-- Left text block -->
+    <rect x="160" y="280" width="320" height="16" rx="4" fill="#4ade8033"/>
+    <rect x="160" y="316" width="280" height="52" rx="6" fill="#4ade8099"/>
+    <rect x="160" y="380" width="300" height="16" rx="4" fill="#ffffff22"/>
+    <rect x="160" y="406" width="260" height="12" rx="3" fill="#ffffff11"/>
+    <rect x="160" y="430" width="240" height="12" rx="3" fill="#ffffff11"/>
+    <rect x="160" y="470" width="140" height="44" rx="22" fill="#4ade80"/>
+    <rect x="316" y="470" width="120" height="44" rx="22" fill="none" stroke="#ffffff22" stroke-width="1.5"/>
+    <!-- Logo dot -->
+    <circle cx="168" cy="100" r="8" fill="#4ade80"/>
+    <rect x="184" y="90" width="100" height="18" rx="4" fill="#ffffff33"/>
+  </svg>
+</template>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><div class="logo-dot"></div>PadelKu</div>
+  <ul class="nav-links">
+    <li><a onclick="window.openPanel('schedule')">Jadwal</a></li>
+    <li><a onclick="window.openPanel('courts')">Lapangan</a></li>
+    <li><a onclick="window.openPanel('membership')">Membership</a></li>
+    <li><a onclick="window.openPanel('matchmaking')">Matchmaking</a></li>
+  </ul>
+  <button class="nav-cta" onclick="window.openPanel('schedule')">Booking Sekarang</button>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow"></div><div class="hero-glow2"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><div class="badge-dot"></div>Jadwal real-time tersedia sekarang</div>
+    <h1>Booking<br>Lapangan <span class="accent">Padel</span><br><span class="thin">Dalam Detik.</span></h1>
+    <p class="hero-desc">Lihat jadwal kosong, pilih lapangan, bayar via QRIS — semua dalam satu tempat. Tanpa antrian, tanpa telepon, tanpa ribet.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="window.openPanel('schedule')">
+        Cek Jadwal Sekarang
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="btn-ghost" onclick="window.openPanel('membership')">Lihat Paket Member</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num">6<span>+</span></div><div class="stat-label">Lapangan Tersedia</div></div>
+      <div><div class="stat-num">2<span>rb+</span></div><div class="stat-label">Booking Per Bulan</div></div>
+      <div><div class="stat-num">98<span>%</span></div><div class="stat-label">Kepuasan Player</div></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="court-wrapper">
+      <div class="float-card fc-available">
+        <div class="fc-label">Status Lapangan A</div>
+        <div class="fc-value"><div class="fc-dot-live"></div>Live — Tersedia</div>
+        <div class="fc-slots"><span class="fc-slot free">08:00</span><span class="fc-slot taken">10:00</span><span class="fc-slot free">12:00</span><span class="fc-slot free">14:00</span></div>
+      </div>
+      <div class="float-card fc-booking">
+        <div class="fc-label">Booking Terkonfirmasi</div>
+        <div class="fc-value">✓ &nbsp;Lapangan B · 16:00</div>
+        <div style="margin-top:8px;font-size:11px;color:var(--text-muted)">Kode: <strong style="color:var(--lime)">PDL-4821</strong></div>
+      </div>
+      <div class="float-card fc-member">
+        <div class="fc-label">Paket Member</div>
+        <div class="fc-value"><div class="fc-dot-cyan"></div>7 sesi tersisa</div>
+        <div style="margin-top:8px;display:flex;gap:3px">
+          <div style="width:16px;height:4px;border-radius:2px;background:var(--cyan);opacity:.8"></div><div style="width:16px;height:4px;border-radius:2px;background:var(--cyan);opacity:.8"></div><div style="width:16px;height:4px;border-radius:2px;background:var(--cyan);opacity:.8"></div><div style="width:16px;height:4px;border-radius:2px;background:var(--cyan);opacity:.8"></div><div style="width:16px;height:4px;border-radius:2px;background:var(--cyan);opacity:.8"></div><div style="width:16px;height:4px;border-radius:2px;background:var(--cyan);opacity:.8"></div><div style="width:16px;height:4px;border-radius:2px;background:var(--cyan);opacity:.8"></div><div style="width:16px;height:4px;border-radius:2px;background:var(--border)"></div><div style="width:16px;height:4px;border-radius:2px;background:var(--border)"></div><div style="width:16px;height:4px;border-radius:2px;background:var(--border)"></div>
+        </div>
+      </div>
+      <div class="court-svg-container">
+        <svg id="court-svg" viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+          <defs>
+            <filter id="glow-lime"><feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="glow-ball"><feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <ellipse class="orbit-ring" cx="280" cy="280" rx="260" ry="200"/>
+          <ellipse class="orbit-ring2" cx="280" cy="280" rx="230" ry="170"/>
+          <rect class="court-bg" x="80" y="100" width="400" height="360" rx="4"/>
+          <rect class="court-inner-bg" x="100" y="116" width="360" height="328" rx="2"/>
+          <rect class="court-wall" x="80" y="86" width="400" height="18" rx="2"/>
+          <rect class="court-wall" x="80" y="456" width="400" height="18" rx="2"/>
+          <rect class="court-line court-outer" x="100" y="116" width="360" height="328"/>
+          <line class="court-line court-net" x1="100" y1="280" x2="460" y2="280"/>
+          <line class="court-line court-service" x1="100" y1="198" x2="460" y2="198"/>
+          <line class="court-line court-service" x1="100" y1="362" x2="460" y2="362"/>
+          <line class="court-line court-center" x1="280" y1="116" x2="280" y2="198"/>
+          <line class="court-line court-center" x1="280" y1="362" x2="280" y2="444"/>
+          <line class="court-line court-service" style="animation-delay:0.9s" x1="280" y1="198" x2="280" y2="280"/>
+          <line class="court-line court-service" style="animation-delay:0.9s" x1="280" y1="280" x2="280" y2="362"/>
+          <circle cx="100" cy="280" r="5" fill="oklch(0.72 0.18 200 / 0.9)" filter="url(#glow-lime)"/>
+          <circle cx="460" cy="280" r="5" fill="oklch(0.72 0.18 200 / 0.9)" filter="url(#glow-lime)"/>
+          <line class="scan-line" x1="80" y1="116" x2="480" y2="116"/>
+          <path class="ball-trail" d="M260,180 Q380,120 430,260 Q320,340 190,400 Q130,280 200,150 Q230,165 260,180"/>
+          <circle class="ball" cx="260" cy="180" r="7" filter="url(#glow-ball)"/>
+          <circle class="player-dot p1" cx="200" cy="160" r="6"/><circle class="player-dot p2" cx="360" cy="155" r="6"/>
+          <circle class="player-dot p3" cx="190" cy="395" r="6"/><circle class="player-dot p4" cx="365" cy="400" r="6"/>
+          <text x="280" y="82" text-anchor="middle" fill="oklch(0.88 0.26 128 / 0.6)" font-family="Space Grotesk,sans-serif" font-size="10" font-weight="600" letter-spacing="2">LAPANGAN A</text>
+          <circle cx="100" cy="116" r="3" fill="oklch(0.88 0.26 128)" opacity=".8"/><circle cx="460" cy="116" r="3" fill="oklch(0.88 0.26 128)" opacity=".8"/>
+          <circle cx="100" cy="444" r="3" fill="oklch(0.88 0.26 128)" opacity=".8"/><circle cx="460" cy="444" r="3" fill="oklch(0.88 0.26 128)" opacity=".8"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <!-- Brand -->
+    <div class="footer-brand">
+      <div class="logo" style="margin-bottom:16px"><div class="logo-dot"></div>PadelKu</div>
+      <p class="footer-tagline">Platform booking lapangan padel #1 di Jakarta Selatan. Mudah, cepat, dan transparan — dari pemula hingga atlet.</p>
+      <div class="footer-social">
+        <div class="social-btn" title="Instagram">ig</div>
+        <div class="social-btn" title="TikTok">tt</div>
+        <div class="social-btn" title="YouTube">yt</div>
+        <div class="social-btn" title="Facebook">fb</div>
+      </div>
+    </div>
+    <!-- Quick Links -->
+    <div>
+      <div class="footer-col-title">Menu</div>
+      <div class="footer-links">
+        <a onclick="window.openPanel('schedule')">Cek Jadwal</a>
+        <a onclick="window.openPanel('courts')">Lapangan</a>
+        <a onclick="window.openPanel('membership')">Membership</a>
+        <a onclick="window.openPanel('matchmaking')">Matchmaking</a>
+        <a href="#">Operator Dashboard</a>
+        <a href="#">Tentang Kami</a>
+      </div>
+    </div>
+    <!-- Jam Operasional -->
+    <div>
+      <div class="footer-col-title">Jam Operasional</div>
+      <div class="hours-grid" style="margin-bottom:16px">
+        <div class="hours-row">Senin–Jumat</div><div class="hours-row"><span>07:00 – 23:00</span></div>
+        <div class="hours-row">Sabtu</div><div class="hours-row"><span>06:00 – 24:00</span></div>
+        <div class="hours-row">Minggu</div><div class="hours-row"><span>06:00 – 23:00</span></div>
+        <div class="hours-row">Libur Nasional</div><div class="hours-row"><span>08:00 – 22:00</span></div>
+      </div>
+      <div style="font-size:12px;color:oklch(0.5 0.02 250);padding:8px 12px;background:oklch(0.88 0.26 128 / 0.06);border:1px solid oklch(0.88 0.26 128 / 0.2);border-radius:8px;display:flex;align-items:center;gap:6px">
+        <div style="width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 6px var(--lime);animation:pulse 2s infinite"></div>
+        Buka sekarang · Tutup 23:00
+      </div>
+    </div>
+    <!-- Lokasi & Kontak -->
+    <div>
+      <div class="footer-col-title">Lokasi & Kontak</div>
+      <!-- Map placeholder -->
+      <div class="footer-map">
+        <svg viewBox="0 0 320 120" style="width:100%;height:100%;position:absolute;inset:0;opacity:0.4">
+          <rect width="320" height="120" fill="oklch(0.14 0.04 160 / 0.8)"/>
+          <!-- Grid roads -->
+          <line x1="0" y1="40" x2="320" y2="40" stroke="oklch(0.25 0.03 200)" stroke-width="6"/>
+          <line x1="0" y1="80" x2="320" y2="80" stroke="oklch(0.22 0.03 200)" stroke-width="3"/>
+          <line x1="80" y1="0" x2="80" y2="120" stroke="oklch(0.22 0.03 200)" stroke-width="3"/>
+          <line x1="160" y1="0" x2="160" y2="120" stroke="oklch(0.25 0.03 200)" stroke-width="6"/>
+          <line x1="240" y1="0" x2="240" y2="120" stroke="oklch(0.22 0.03 200)" stroke-width="3"/>
+          <!-- Blocks -->
+          <rect x="82" y="42" width="76" height="36" rx="4" fill="oklch(0.18 0.04 160 / 0.6)"/>
+          <rect x="162" y="42" width="76" height="36" rx="4" fill="oklch(0.18 0.04 160 / 0.6)"/>
+          <rect x="2" y="2" width="76" height="36" rx="4" fill="oklch(0.18 0.04 160 / 0.6)"/>
+          <rect x="162" y="2" width="76" height="36" rx="4" fill="oklch(0.18 0.04 160 / 0.6)"/>
+          <rect x="2" y="82" width="76" height="36" rx="4" fill="oklch(0.18 0.04 160 / 0.6)"/>
+          <rect x="82" y="82" width="76" height="36" rx="4" fill="oklch(0.18 0.04 160 / 0.6)"/>
+          <rect x="242" y="82" width="76" height="36" rx="4" fill="oklch(0.18 0.04 160 / 0.6)"/>
+        </svg>
+        <div class="footer-map-placeholder" style="position:relative;z-index:1">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--lime);margin:0 auto 6px;display:flex;align-items:center;justifyContent:center;box-shadow:0 0 16px var(--lime);font-size:14px;justify-content:center">📍</div>
+          <div style="font-size:11px;color:oklch(0.7 0.02 250);font-weight:600">PadelKu Arena · Kemang</div>
+        </div>
+      </div>
+      <div class="footer-info-row">
+        <div class="footer-info-icon">📍</div>
+        <div class="footer-info-text"><strong>Alamat</strong>Jl. Padel Arena No. 8, Kemang,<br>Jakarta Selatan, DKI Jakarta 12730</div>
+      </div>
+      <div class="footer-info-row">
+        <div class="footer-info-icon">📞</div>
+        <div class="footer-info-text"><strong>Telepon</strong>+62 21 7890 1234</div>
+      </div>
+      <div class="footer-info-row">
+        <div class="footer-info-icon">✉️</div>
+        <div class="footer-info-text"><strong>Email</strong>halo@padelku.id</div>
+      </div>
+      <a href="#" class="footer-wa-btn" style="margin-top:4px">
+        <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M9 1.5A7.5 7.5 0 0 0 2.18 12.4L1.5 16.5l4.22-.66A7.5 7.5 0 1 0 9 1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.5 7c.28.6.7 1.15 1.2 1.6.5.44 1.08.8 1.7 1.03.08.03.23.04.32-.05l.8-.8c.1-.1.28-.13.41-.07l2.1.96c.14.07.18.24.1.37-.3.5-.8 1.1-1.4 1.28-.75.22-1.9.04-3.5-1.35C6.62 8.6 6.06 7.5 5.96 6.73c-.13-.9.47-1.47.96-1.77.13-.08.3-.04.37.1l.96 2.1c.06.13.03.3-.07.41l-.48.5c-.1.1-.15.24-.2.43Z" fill="currentColor"/></svg>
+        Chat WhatsApp Admin
+      </a>
+    </div>
+  </div>
+  <!-- Bottom bar -->
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 PadelKu. Hak cipta dilindungi. Dibuat dengan ❤️ untuk komunitas padel Indonesia.</div>
+    <div class="footer-badges">
+      <span class="footer-badge">SSL Secured</span>
+      <span class="footer-badge">Midtrans Partner</span>
+      <span class="footer-badge">QRIS Resmi</span>
+    </div>
+    <div class="footer-copy" style="text-align:right">Syarat & Ketentuan · Kebijakan Privasi</div>
+  </div>
+</footer>
+
+<div id="app-root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+// ── DATA ────────────────────────────────────────────────
+const COURTS = [
+  { id:'A', name:'Lapangan A', type:'Indoor', surface:'Kaca Premium', price:80000, memberPrice:65000, status:'available', color:'#4ade80', desc:'Lapangan indoor dengan dinding kaca full panoramic dan pencahayaan LED premium.', features:['AC Central','CCTV 4K','Locker Room','WiFi 1Gbps'] },
+  { id:'B', name:'Lapangan B', type:'Indoor', surface:'Kaca Premium', price:80000, memberPrice:65000, status:'available', color:'#4ade80', desc:'Standar internasional dengan permukaan kaca anti-reflektif dan sistem ventilasi canggih.', features:['AC Central','CCTV 4K','Shower Room','WiFi 1Gbps'] },
+  { id:'C', name:'Lapangan C', type:'Outdoor', surface:'Sintetis Pro', price:65000, memberPrice:50000, status:'available', color:'#22d3ee', desc:'Lapangan outdoor dengan artificial turf premium tahan cuaca, view city skyline.', features:['Outdoor View','Flood Light','Parking VIP','Canopy'] },
+  { id:'D', name:'Lapangan D', type:'Outdoor', surface:'Sintetis Pro', price:65000, memberPrice:50000, status:'maintenance', color:'#fbbf24', desc:'Sedang dalam jadwal perawatan rutin.', features:['Outdoor View','Flood Light','Parking VIP','Canopy'] },
+  { id:'E', name:'Lapangan E', type:'Indoor', surface:'Kaca Ultra', price:95000, memberPrice:75000, status:'available', color:'#a78bfa', desc:'Lapangan premium dengan sensor smart tracking untuk analisis permainan real-time.', features:['Smart Tracking','AC Inverter','VIP Lounge','4K Recording'] },
+  { id:'F', name:'Lapangan F', type:'VIP Suite', surface:'Kaca Ultra Premium', price:120000, memberPrice:95000, status:'available', color:'#fbbf24', desc:'Pengalaman padel tertinggi. Private court dengan concierge service & ruang santai eksklusif.', features:['Private Lounge','Butler Service','4K Recording','Spa Access'] },
+];
+const HOURS = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00'];
+function genSlots(courtId, dayOffset) {
+  const seed = courtId.charCodeAt(0) + dayOffset*7;
+  const taken = new Set(), maint = new Set();
+  for(let i=0;i<4+(seed%4);i++) taken.add(HOURS[(seed*(i+3)+i*5)%HOURS.length]);
+  if(seed%5===0) maint.add(HOURS[(seed*2)%HOURS.length]);
+  return HOURS.map(h=>({time:h,status:maint.has(h)?'maintenance':taken.has(h)?'taken':'available'}));
+}
+function getDays() {
+  const now=new Date(2026,4,1);
+  const dn=['Min','Sen','Sel','Rab','Kam','Jum','Sab'],mn=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  return Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(d.getDate()+i);return{offset:i,label:i===0?'Hari Ini':i===1?'Besok':dn[d.getDay()],date:d.getDate(),month:mn[d.getMonth()]};});
+}
+const DAYS=getDays();
+const PLAYERS=[
+  {id:1,name:'Rafi Andika',level:'Advanced',wins:142,losses:38,winRate:79,avatar:'RA',streak:8,available:'Pagi & Sore',badge:'🏆'},
+  {id:2,name:'Sari Putri',level:'Advanced',wins:118,losses:45,winRate:72,avatar:'SP',streak:5,available:'Sore & Malam',badge:'⚡'},
+  {id:3,name:'Dimas Prayoga',level:'Intermediate',wins:67,losses:52,winRate:56,avatar:'DP',streak:2,available:'Malam',badge:null},
+  {id:4,name:'Nina Kartika',level:'Intermediate',wins:54,losses:41,winRate:57,avatar:'NK',streak:4,available:'Pagi',badge:null},
+  {id:5,name:'Bagas Wicaksono',level:'Beginner',wins:12,losses:18,winRate:40,avatar:'BW',streak:0,available:'Weekend',badge:null},
+  {id:6,name:'Citra Maharani',level:'Intermediate',wins:89,losses:63,winRate:59,avatar:'CM',streak:3,available:'Sore & Malam',badge:'🔥'},
+  {id:7,name:'Rizal Fadilah',level:'Advanced',wins:201,losses:71,winRate:74,avatar:'RF',streak:12,available:'Fleksibel',badge:'👑'},
+  {id:8,name:'Ayu Lestari',level:'Beginner',wins:8,losses:14,winRate:36,avatar:'AL',streak:0,available:'Weekend',badge:null},
+];
+
+// ── ICONS ────────────────────────────────────────────────
+const Ico = {
+  close:()=><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
+  arrow:()=><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  back:()=><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 12l-4-4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  check:()=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/><path d="M7 12l3.5 3.5L17 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  wa:()=><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M9 1.5A7.5 7.5 0 0 0 2.18 12.4L1.5 16.5l4.22-.66A7.5 7.5 0 1 0 9 1.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M6.5 7c.28.6.7 1.15 1.2 1.6.5.44 1.08.8 1.7 1.03.08.03.23.04.32-.05l.8-.8c.1-.1.28-.13.41-.07l2.1.96c.14.07.18.24.1.37-.3.5-.8 1.1-1.4 1.28-.75.22-1.9.04-3.5-1.35C6.62 8.6 6.06 7.5 5.96 6.73c-.13-.9.47-1.47.96-1.77.13-.08.3-.04.37.1l.96 2.1c.06.13.03.3-.07.41l-.48.5c-.1.1-.15.24-.2.43Z" fill="currentColor"/></svg>,
+};
+
+// ── SLIDE PANEL WRAPPER ──────────────────────────────────
+function SlidePanel({onClose,children,maxWidth='900px',maxHeight='90vh'}) {
+  const [animIn,setAnimIn]=useState(false);
+  useEffect(()=>{
+    requestAnimationFrame(()=>setAnimIn(true));
+    const h=e=>{if(e.key==='Escape')close();};
+    window.addEventListener('keydown',h);
+    document.body.style.overflow='hidden';
+    return()=>{window.removeEventListener('keydown',h);document.body.style.overflow='';};
+  },[]);
+  const close=()=>{setAnimIn(false);setTimeout(onClose,350);};
+  return(
+    <div onClick={e=>{if(e.target===e.currentTarget)close();}} style={{position:'fixed',inset:0,zIndex:300,background:'oklch(0 0 0 / 0.75)',backdropFilter:'blur(5px)',display:'flex',alignItems:'flex-end',justifyContent:'center',opacity:animIn?1:0,transition:'opacity 0.35s ease'}}>
+      <div style={{width:'100%',maxWidth,background:'oklch(0.13 0.022 248)',borderRadius:'24px 24px 0 0',border:'1px solid oklch(0.25 0.025 245)',borderBottom:'none',boxShadow:'0 -20px 60px oklch(0 0 0 / 0.5)',transform:animIn?'translateY(0)':'translateY(100%)',transition:'transform 0.4s cubic-bezier(0.22,1,0.36,1)',maxHeight,display:'flex',flexDirection:'column',overflow:'hidden'}}>
+        <div style={{display:'flex',justifyContent:'center',padding:'12px 0 0',flexShrink:0}}>
+          <div style={{width:40,height:4,borderRadius:2,background:'oklch(0.3 0.025 245)'}}></div>
+        </div>
+        {React.cloneElement(children,{onClose:close})}
+      </div>
+    </div>
+  );
+}
+
+// ── STEP INDICATOR ───────────────────────────────────────
+function StepIndicator({current,steps}) {
+  return(
+    <div style={{display:'flex',alignItems:'center',gap:6}}>
+      {steps.map((s,i)=>(
+        <React.Fragment key={i}>
+          <div style={{display:'flex',alignItems:'center',gap:6}}>
+            <div style={{width:i===current?24:8,height:8,borderRadius:4,background:i<current?'oklch(0.88 0.26 128 / 0.5)':i===current?'oklch(0.88 0.26 128)':'oklch(0.3 0.025 245)',boxShadow:i===current?'0 0 8px oklch(0.88 0.26 128)':'none',transition:'all 0.3s'}}></div>
+            {i===current&&<span style={{fontSize:11,color:'oklch(0.88 0.26 128)',fontWeight:600,fontFamily:'Space Grotesk',whiteSpace:'nowrap'}}>{s}</span>}
+          </div>
+          {i<steps.length-1&&<div style={{width:16,height:1,background:'oklch(0.25 0.025 245)'}}></div>}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+// ── QRIS COMPONENT ───────────────────────────────────────
+function QRISDisplay({amount}) {
+  const [secs,setSecs]=useState(15*60);
+  const [scanned,setScanned]=useState(false);
+  useEffect(()=>{
+    const t=setInterval(()=>setSecs(s=>s>0?s-1:0),1000);
+    return()=>clearInterval(t);
+  },[]);
+  const mm=String(Math.floor(secs/60)).padStart(2,'0');
+  const ss=String(secs%60).padStart(2,'0');
+  const urgent=secs<120;
+
+  // Generate QR-like pattern deterministically
+  const cells=[];
+  const size=21;
+  // finder patterns corners
+  const finderPositions=[[0,0],[0,14],[14,0]];
+  const isFinderOuter=(r,c)=>finderPositions.some(([fr,fc])=>r>=fr&&r<=fr+6&&c>=fc&&c<=fc+6&&(r===fr||r===fr+6||c===fc||c===fc+6));
+  const isFinderInner=(r,c)=>finderPositions.some(([fr,fc])=>r>=fr+2&&r<=fr+4&&c>=fc+2&&c<=fc+4);
+  const isTiming=(r,c)=>(r===6&&c>=8&&c<=12)||(c===6&&r>=8&&r<=12);
+  const seed=amount||82000;
+  const isData=(r,c)=>{
+    if(isFinderOuter(r,c)||isFinderInner(r,c)||isTiming(r,c))return false;
+    return ((r*c+r+c+seed)%3)!==0;
+  };
+  for(let r=0;r<size;r++){for(let c=0;c<size;c++){
+    const on=isFinderOuter(r,c)||isFinderInner(r,c)||(isTiming(r,c)&&(r+c)%2===0)||isData(r,c);
+    cells.push({r,c,on});
+  }}
+
+  return(
+    <div style={{textAlign:'center'}}>
+      {/* QRIS header */}
+      <div style={{background:'linear-gradient(135deg,#e63946,#c1121f)',borderRadius:'16px 16px 0 0',padding:'10px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div style={{fontFamily:'Space Grotesk',fontWeight:800,fontSize:20,color:'#fff',letterSpacing:'-0.5px'}}>QRIS</div>
+        <div style={{fontSize:10,color:'rgba(255,255,255,0.8)',fontWeight:600}}>SCAN UNTUK BAYAR</div>
+        <div style={{fontSize:10,color:'rgba(255,255,255,0.8)'}}>GPN BI</div>
+      </div>
+
+      {/* QR box */}
+      <div style={{background:'#fff',padding:'16px',position:'relative',overflow:'hidden'}}>
+        <div style={{fontSize:10,color:'#666',marginBottom:8,fontWeight:600}}>PadelKu Arena · Kemang</div>
+        <div style={{display:'inline-block',padding:8,background:'#fff',border:'1px solid #eee',borderRadius:8,position:'relative'}}>
+          <svg viewBox={`0 0 ${size*8} ${size*8}`} width="160" height="160">
+            {cells.map(({r,c,on})=>(
+              on?<rect key={`${r}-${c}`} x={c*8} y={r*8} width={7} height={7} rx={1} fill="#1a1a1a"/>:null
+            ))}
+          </svg>
+          {/* Scan line */}
+          {!scanned&&<div style={{position:'absolute',left:8,right:8,height:2,background:'linear-gradient(90deg,transparent,rgba(229,57,70,0.8),transparent)',animation:'qrScan 2s ease-in-out infinite',top:8}}></div>}
+        </div>
+        <div style={{marginTop:10,fontSize:11,color:'#666'}}>
+          Bayar ke: <strong style={{color:'#1a1a1a'}}>PadelKu.Arena</strong>
+        </div>
+        <div style={{fontFamily:'monospace',fontSize:18,fontWeight:700,color:'#1a1a1a',marginTop:4}}>
+          Rp {amount.toLocaleString('id-ID')}
+        </div>
+        <div style={{marginTop:4,fontSize:10,color:'#999'}}>ID: PDL{Math.floor(Date.now()/1000).toString().slice(-8)}</div>
+      </div>
+
+      {/* Timer */}
+      <div style={{background:urgent?'oklch(0.65 0.18 20 / 0.15)':'oklch(0.14 0.025 245)',borderRadius:'0 0 16px 16px',padding:'12px 20px',border:`1px solid ${urgent?'oklch(0.65 0.18 20 / 0.4)':'oklch(0.22 0.025 245)'}`,borderTop:'none',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div style={{fontSize:12,color:urgent?'oklch(0.65 0.18 20)':'oklch(0.6 0.02 250)'}}>⏱ Berlaku selama</div>
+        <div style={{fontFamily:'Space Grotesk',fontWeight:700,fontSize:20,color:urgent?'oklch(0.65 0.18 20)':'oklch(0.88 0.26 128)',fontVariantNumeric:'tabular-nums'}}>{mm}:{ss}</div>
+      </div>
+
+      <div style={{marginTop:12,display:'flex',gap:8,justifyContent:'center',flexWrap:'wrap'}}>
+        {['GoPay','OVO','DANA','BCA Mobile','Livin Mandiri'].map(app=>(
+          <div key={app} style={{fontSize:10,padding:'4px 10px',borderRadius:100,background:'oklch(0.17 0.022 248)',border:'1px solid oklch(0.24 0.022 248)',color:'oklch(0.6 0.02 250)'}}>
+            {app}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── BANK TRANSFER COMPONENT ──────────────────────────────
+function BankTransfer({amount}) {
+  const [selBank,setSelBank]=useState('bca');
+  const banks=[
+    {id:'bca',name:'BCA',color:'#1e3a8a',bg:'#dbeafe',va:'8808'+Math.floor(10000000+Math.random()*90000000),logo:'BCA'},
+    {id:'mandiri',name:'Mandiri',color:'#1e40af',bg:'#dbeafe',va:'8888'+Math.floor(10000000+Math.random()*90000000),logo:'MDR'},
+    {id:'bni',name:'BNI',color:'#f97316',bg:'#ffedd5',va:'9888'+Math.floor(10000000+Math.random()*90000000),logo:'BNI'},
+    {id:'bri',name:'BRI',color:'#1d4ed8',bg:'#dbeafe',va:'7888'+Math.floor(10000000+Math.random()*90000000),logo:'BRI'},
+  ];
+  const b=banks.find(x=>x.id===selBank);
+  const [copied,setCopied]=useState(false);
+  const copy=()=>{navigator.clipboard?.writeText(b.va);setCopied(true);setTimeout(()=>setCopied(false),2000);};
+
+  return(
+    <div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:16}}>
+        {banks.map(bank=>(
+          <button key={bank.id} onClick={()=>setSelBank(bank.id)} style={{padding:'10px 6px',borderRadius:10,border:`2px solid ${selBank===bank.id?'oklch(0.88 0.26 128 / 0.6)':'oklch(0.26 0.025 245)'}`,background:selBank===bank.id?'oklch(0.88 0.26 128 / 0.08)':'oklch(0.16 0.025 245)',cursor:'pointer',transition:'all 0.15s',textAlign:'center'}}>
+            <div style={{fontFamily:'Space Grotesk',fontWeight:700,fontSize:13,color:selBank===bank.id?'oklch(0.88 0.26 128)':'oklch(0.75 0.02 250)'}}>{bank.logo}</div>
+            <div style={{fontSize:10,color:'oklch(0.55 0.02 250)',marginTop:2}}>{bank.name}</div>
+          </button>
+        ))}
+      </div>
+      <div style={{background:'oklch(0.15 0.025 245)',border:'1px solid oklch(0.24 0.025 245)',borderRadius:14,padding:20}}>
+        <div style={{fontSize:11,color:'oklch(0.5 0.02 250)',fontWeight:600,letterSpacing:'0.5px',textTransform:'uppercase',marginBottom:12}}>Nomor Virtual Account {b.name}</div>
+        <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:16}}>
+          <div style={{flex:1,fontFamily:'Space Grotesk',fontWeight:700,fontSize:20,letterSpacing:'2px',color:'oklch(0.96 0.005 250)',wordBreak:'break-all'}}>{b.va}</div>
+          <button onClick={copy} style={{background:copied?'oklch(0.88 0.26 128 / 0.15)':'oklch(0.2 0.025 245)',border:`1px solid ${copied?'oklch(0.88 0.26 128 / 0.4)':'oklch(0.3 0.025 245)'}`,borderRadius:8,padding:'8px 14px',cursor:'pointer',fontSize:12,fontWeight:600,color:copied?'oklch(0.88 0.26 128)':'oklch(0.65 0.02 250)',transition:'all 0.2s',whiteSpace:'nowrap'}}>
+            {copied?'✓ Tersalin':'Salin'}
+          </button>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',fontSize:13,padding:'12px 0',borderTop:'1px solid oklch(0.22 0.025 245)',borderBottom:'1px solid oklch(0.22 0.025 245)',marginBottom:12}}>
+          <span style={{color:'oklch(0.6 0.02 250)'}}>Total Transfer</span>
+          <span style={{fontFamily:'Space Grotesk',fontWeight:700,color:'oklch(0.88 0.26 128)'}}>Rp {amount.toLocaleString('id-ID')}</span>
+        </div>
+        <div style={{fontSize:12,color:'oklch(0.55 0.02 250)',lineHeight:1.6}}>
+          Pastikan nominal transfer <strong style={{color:'oklch(0.88 0.26 128)'}}>tepat sampai angka terakhir</strong>. Transfer berlaku selama <strong style={{color:'oklch(0.96 0.005 250)'}}>24 jam</strong>.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── E-WALLET COMPONENT ───────────────────────────────────
+function EWalletPay({amount}) {
+  const [sel,setSel]=useState(null);
+  const wallets=[
+    {id:'gopay',name:'GoPay',color:'#00aa13',icon:'GP'},
+    {id:'ovo',name:'OVO',color:'#4c2a86',icon:'OV'},
+    {id:'dana',name:'DANA',color:'#118eea',icon:'DA'},
+    {id:'shopeepay',name:'ShopeePay',color:'#ee4d2d',icon:'SP'},
+  ];
+  return(
+    <div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:10,marginBottom:16}}>
+        {wallets.map(w=>(
+          <button key={w.id} onClick={()=>setSel(w.id)} style={{display:'flex',alignItems:'center',gap:12,padding:'14px 16px',borderRadius:12,border:`1.5px solid ${sel===w.id?w.color+'88':'oklch(0.26 0.025 245)'}`,background:sel===w.id?w.color+'12':'oklch(0.16 0.025 245)',cursor:'pointer',transition:'all 0.15s'}}>
+            <div style={{width:36,height:36,borderRadius:10,background:w.color,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Space Grotesk',fontWeight:700,fontSize:12,color:'#fff',flexShrink:0}}>{w.icon}</div>
+            <div style={{textAlign:'left'}}>
+              <div style={{fontFamily:'Space Grotesk',fontWeight:600,fontSize:13,color:sel===w.id?'oklch(0.96 0.005 250)':'oklch(0.75 0.02 250)'}}>{w.name}</div>
+              <div style={{fontSize:11,color:'oklch(0.5 0.02 250)'}}>Bayar langsung</div>
+            </div>
+          </button>
+        ))}
+      </div>
+      {sel&&(
+        <div style={{padding:16,background:'oklch(0.15 0.025 245)',border:'1px solid oklch(0.24 0.025 245)',borderRadius:12,textAlign:'center'}}>
+          <div style={{fontSize:13,color:'oklch(0.6 0.02 250)',marginBottom:4}}>Arahkan ke aplikasi {wallets.find(w=>w.id===sel)?.name}</div>
+          <div style={{fontFamily:'Space Grotesk',fontWeight:700,fontSize:18,color:'oklch(0.88 0.26 128)'}}>Rp {amount.toLocaleString('id-ID')}</div>
+          <div style={{fontSize:11,color:'oklch(0.5 0.02 250)',marginTop:4}}>Kamu akan diarahkan ke aplikasi untuk konfirmasi</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── BOOKING SCHEDULE CONTENT ─────────────────────────────
+function ScheduleContent({onClose}) {
+  const [selDay,setSelDay]=useState(0);
+  const [selCourt,setSelCourt]=useState('A');
+  const [selSlot,setSelSlot]=useState(null);
+  const [step,setStep]=useState('schedule'); // schedule|form|payment|success
+  const [payMethod,setPayMethod]=useState('qris');
+  const [addons,setAddons]=useState({raket:0,air:0,energi:0});
+  const [form,setForm]=useState({nama:'',hp:'',email:'',catatan:''});
+  const [formErr,setFormErr]=useState({});
+
+  const slots=genSlots(selCourt,selDay);
+  const court=COURTS.find(c=>c.id===selCourt);
+  const day=DAYS[selDay];
+  const avail=slots.filter(s=>s.status==='available').length;
+
+  const addonItems=[
+    {key:'raket',label:'Sewa Raket Padel',price:25000,icon:'🎾'},
+    {key:'air',label:'Air Mineral 600ml',price:8000,icon:'💧'},
+    {key:'energi',label:'Energi Drink',price:15000,icon:'⚡'},
+  ];
+  const addonTotal=addonItems.reduce((s,a)=>s+a.price*addons[a.key],0);
+  const subtotal=court.price+2000+addonTotal;
+
+  const validateForm=()=>{
+    const err={};
+    if(!form.nama.trim()) err.nama='Nama wajib diisi';
+    if(!form.hp.trim()||form.hp.length<10) err.hp='Nomor HP tidak valid';
+    if(form.email&&!/\S+@\S+\.\S+/.test(form.email)) err.email='Format email tidak valid';
+    setFormErr(err);
+    return Object.keys(err).length===0;
+  };
+
+  const stepLabels=['Pilih Jadwal','Data Pemesan','Pembayaran'];
+  const stepIdx=step==='schedule'?0:step==='form'?1:step==='payment'?2:3;
+
+  if(step==='success'){
+    const code='PDL-'+Math.floor(1000+Math.random()*9000);
+    return(
+      <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',padding:40}}>
+        <div style={{textAlign:'center',maxWidth:440}}>
+          <div style={{width:80,height:80,borderRadius:'50%',background:'oklch(0.88 0.26 128 / 0.12)',border:'2px solid oklch(0.88 0.26 128 / 0.4)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 24px',color:'oklch(0.88 0.26 128)'}}>
+            <Ico.check/>
+          </div>
+          <div style={{fontFamily:'Space Grotesk',fontSize:26,fontWeight:700,letterSpacing:'-1px',marginBottom:8}}>Booking Berhasil!</div>
+          <div style={{fontSize:14,color:'oklch(0.6 0.02 250)',marginBottom:28,lineHeight:1.6}}>
+            {court.name} · {day.label}, {day.date} {day.month} 2026 · {selSlot?.time}<br/>
+            <span style={{color:'oklch(0.72 0.18 200)'}}>Atas nama: {form.nama}</span>
+          </div>
+          <div style={{background:'oklch(0.16 0.025 245)',border:'1px solid oklch(0.28 0.025 245)',borderRadius:16,padding:24,marginBottom:20}}>
+            <div style={{fontSize:11,color:'oklch(0.5 0.02 250)',marginBottom:8,letterSpacing:'1px',textTransform:'uppercase'}}>Kode Booking</div>
+            <div style={{fontFamily:'Space Grotesk',fontSize:36,fontWeight:700,color:'oklch(0.88 0.26 128)',letterSpacing:'4px'}}>{code}</div>
+            <div style={{fontSize:11,color:'oklch(0.5 0.02 250)',marginTop:6}}>Simpan kode ini untuk check-in di lokasi</div>
+          </div>
+          <div style={{background:'oklch(0.16 0.025 245)',border:'1px solid oklch(0.22 0.025 245)',borderRadius:12,padding:16,marginBottom:24,fontSize:13,color:'oklch(0.6 0.02 250)',lineHeight:1.6}}>
+            Konfirmasi booking dikirim ke <strong style={{color:'oklch(0.96 0.005 250)'}}>{form.hp}</strong>{form.email&&<> & <strong style={{color:'oklch(0.96 0.005 250)'}}>{form.email}</strong></>}
+          </div>
+          <div style={{display:'flex',gap:12,justifyContent:'center'}}>
+            <button onClick={onClose} style={{background:'oklch(0.88 0.26 128)',color:'oklch(0.15 0.05 128)',border:'none',borderRadius:100,padding:'12px 28px',fontFamily:'Space Grotesk',fontWeight:700,fontSize:14,cursor:'pointer'}}>Selesai</button>
+            <button style={{background:'oklch(0.07 0.04 145 / 0.2)',color:'oklch(0.75 0.2 145)',border:'1px solid oklch(0.3 0.15 145 / 0.3)',borderRadius:100,padding:'11px 22px',fontSize:14,cursor:'pointer',display:'flex',alignItems:'center',gap:7}}><Ico.wa/> WhatsApp</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // STEP: PAYMENT
+  if(step==='payment') return(
+    <div style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
+      <div style={{padding:'20px 32px 16px',borderBottom:'1px solid oklch(0.22 0.025 245)',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div style={{display:'flex',flexDirection:'column',gap:8}}>
+          <div style={{fontFamily:'Space Grotesk',fontSize:18,fontWeight:700,letterSpacing:'-0.5px'}}>Pilih Metode Pembayaran</div>
+          <StepIndicator current={2} steps={stepLabels}/>
+        </div>
+        <button onClick={()=>setStep('form')} style={{background:'none',border:'none',color:'oklch(0.6 0.02 250)',cursor:'pointer',display:'flex',alignItems:'center',gap:5,fontSize:13}}><Ico.back/> Kembali</button>
+      </div>
+      <div style={{overflowY:'auto',flex:1,padding:'24px 32px'}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1.2fr',gap:28,alignItems:'start'}}>
+          {/* Left: method selector */}
+          <div>
+            <div style={{fontFamily:'Space Grotesk',fontSize:14,fontWeight:600,marginBottom:14,color:'oklch(0.6 0.02 250)',textTransform:'uppercase',letterSpacing:'0.5px',fontSize:11}}>Metode Pembayaran</div>
+            {[{id:'qris',label:'QRIS',sub:'Scan kode QR dari app manapun',badge:'TERCEPAT',icon:'▦'},
+              {id:'ewallet',label:'E-Wallet',sub:'GoPay, OVO, DANA, ShopeePay',badge:null,icon:'◈'},
+              {id:'bank',label:'Transfer Bank',sub:'BCA, Mandiri, BNI, BRI',badge:null,icon:'⬡'},
+            ].map(m=>(
+              <button key={m.id} onClick={()=>setPayMethod(m.id)} style={{width:'100%',display:'flex',alignItems:'center',gap:14,padding:'14px 16px',borderRadius:14,border:`1.5px solid ${payMethod===m.id?'oklch(0.88 0.26 128 / 0.5)':'oklch(0.24 0.025 245)'}`,background:payMethod===m.id?'oklch(0.88 0.26 128 / 0.06)':'oklch(0.16 0.025 245)',cursor:'pointer',marginBottom:8,transition:'all 0.15s',textAlign:'left'}}>
+                <div style={{width:38,height:38,borderRadius:10,background:payMethod===m.id?'oklch(0.88 0.26 128 / 0.15)':'oklch(0.2 0.025 245)',border:`1px solid ${payMethod===m.id?'oklch(0.88 0.26 128 / 0.3)':'oklch(0.28 0.025 245)'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0}}>{m.icon}</div>
+                <div style={{flex:1}}>
+                  <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:2}}>
+                    <span style={{fontFamily:'Space Grotesk',fontWeight:600,fontSize:14,color:payMethod===m.id?'oklch(0.96 0.005 250)':'oklch(0.75 0.02 250)'}}>{m.label}</span>
+                    {m.badge&&<span style={{fontSize:9,background:'oklch(0.88 0.26 128)',color:'oklch(0.15 0.05 128)',padding:'2px 7px',borderRadius:100,fontWeight:700}}>{m.badge}</span>}
+                  </div>
+                  <div style={{fontSize:11,color:'oklch(0.5 0.02 250)'}}>{m.sub}</div>
+                </div>
+                <div style={{width:18,height:18,borderRadius:'50%',border:`2px solid ${payMethod===m.id?'oklch(0.88 0.26 128)':'oklch(0.35 0.025 245)'}`,background:payMethod===m.id?'oklch(0.88 0.26 128)':'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  {payMethod===m.id&&<div style={{width:6,height:6,borderRadius:'50%',background:'oklch(0.15 0.05 128)'}}></div>}
+                </div>
+              </button>
+            ))}
+
+            {/* Order summary mini */}
+            <div style={{marginTop:16,background:'oklch(0.16 0.025 245)',border:'1px solid oklch(0.22 0.025 245)',borderRadius:12,padding:16}}>
+              <div style={{fontSize:11,fontWeight:600,color:'oklch(0.6 0.02 250)',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:12}}>Ringkasan</div>
+              {[['Lapangan',court.name],['Waktu',`${day.date} ${day.month} · ${selSlot?.time}`],['Atas Nama',form.nama]].map(([l,v])=>(
+                <div key={l} style={{display:'flex',justifyContent:'space-between',fontSize:12,marginBottom:8}}>
+                  <span style={{color:'oklch(0.55 0.02 250)'}}>{l}</span><span style={{fontWeight:500}}>{v}</span>
+                </div>
+              ))}
+              <div style={{borderTop:'1px solid oklch(0.22 0.025 245)',paddingTop:10,display:'flex',justifyContent:'space-between',fontFamily:'Space Grotesk',fontWeight:700,fontSize:16}}>
+                <span>Total</span><span style={{color:'oklch(0.88 0.26 128)'}}>Rp {subtotal.toLocaleString('id-ID')}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: payment interface */}
+          <div>
+            <div style={{fontFamily:'Space Grotesk',fontSize:11,fontWeight:600,marginBottom:14,color:'oklch(0.6 0.02 250)',textTransform:'uppercase',letterSpacing:'0.5px'}}>
+              {payMethod==='qris'?'Scan QR Code':payMethod==='ewallet'?'Pilih E-Wallet':'Pilih Bank'}
+            </div>
+            {payMethod==='qris'&&<QRISDisplay amount={subtotal}/>}
+            {payMethod==='ewallet'&&<EWalletPay amount={subtotal}/>}
+            {payMethod==='bank'&&<BankTransfer amount={subtotal}/>}
+
+            <button onClick={()=>setStep('success')} style={{width:'100%',marginTop:20,background:'oklch(0.88 0.26 128)',color:'oklch(0.13 0.05 128)',border:'none',borderRadius:14,padding:16,fontFamily:'Space Grotesk',fontSize:15,fontWeight:700,cursor:'pointer',boxShadow:'0 0 30px oklch(0.88 0.26 128 / 0.3)',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+              Konfirmasi Pembayaran <Ico.arrow/>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // STEP: FORM
+  if(step==='form') return(
+    <div style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
+      <div style={{padding:'20px 32px 16px',borderBottom:'1px solid oklch(0.22 0.025 245)',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div style={{display:'flex',flexDirection:'column',gap:8}}>
+          <div style={{fontFamily:'Space Grotesk',fontSize:18,fontWeight:700,letterSpacing:'-0.5px'}}>Data Pemesan</div>
+          <StepIndicator current={1} steps={stepLabels}/>
+        </div>
+        <button onClick={()=>setStep('schedule')} style={{background:'none',border:'none',color:'oklch(0.6 0.02 250)',cursor:'pointer',display:'flex',alignItems:'center',gap:5,fontSize:13}}><Ico.back/> Kembali</button>
+      </div>
+      <div style={{overflowY:'auto',flex:1,padding:'24px 32px'}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1.1fr',gap:32,alignItems:'start'}}>
+          {/* Form */}
+          <div>
+            <div style={{fontFamily:'Space Grotesk',fontSize:14,fontWeight:600,marginBottom:20,color:'oklch(0.75 0.02 250)'}}>Isi data untuk konfirmasi booking</div>
+            <div style={{display:'flex',flexDirection:'column',gap:16}}>
+              <div>
+                <label className="field-label">Nama Lengkap *</label>
+                <input className="field-input" placeholder="cth. Rafi Andika" value={form.nama} onChange={e=>setForm({...form,nama:e.target.value})}/>
+                {formErr.nama&&<div style={{fontSize:11,color:'oklch(0.65 0.18 20)',marginTop:4}}>{formErr.nama}</div>}
+              </div>
+              <div>
+                <label className="field-label">Nomor WhatsApp / HP *</label>
+                <input className="field-input" placeholder="cth. 08123456789" value={form.hp} onChange={e=>setForm({...form,hp:e.target.value})}/>
+                {formErr.hp&&<div style={{fontSize:11,color:'oklch(0.65 0.18 20)',marginTop:4}}>{formErr.hp}</div>}
+              </div>
+              <div>
+                <label className="field-label">Email (Opsional)</label>
+                <input className="field-input" type="email" placeholder="cth. nama@email.com" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/>
+                {formErr.email&&<div style={{fontSize:11,color:'oklch(0.65 0.18 20)',marginTop:4}}>{formErr.email}</div>}
+              </div>
+              <div>
+                <label className="field-label">Catatan (Opsional)</label>
+                <textarea className="field-input" placeholder="Permintaan khusus, kebutuhan peralatan, dll." value={form.catatan} onChange={e=>setForm({...form,catatan:e.target.value})} rows={3} style={{resize:'vertical'}}/>
+              </div>
+            </div>
+          </div>
+
+          {/* Add-ons + summary */}
+          <div>
+            <div style={{fontFamily:'Space Grotesk',fontSize:13,fontWeight:600,marginBottom:14,color:'oklch(0.6 0.02 250)',textTransform:'uppercase',letterSpacing:'0.5px',fontSize:11}}>Tambahkan Add-on</div>
+            <div style={{background:'oklch(0.16 0.025 245)',border:'1px solid oklch(0.22 0.025 245)',borderRadius:14,padding:16,marginBottom:20}}>
+              {addonItems.map(a=>(
+                <div key={a.key} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid oklch(0.2 0.025 245)'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:10}}>
+                    <span style={{fontSize:20}}>{a.icon}</span>
+                    <div>
+                      <div style={{fontSize:13,fontWeight:500}}>{a.label}</div>
+                      <div style={{fontSize:11,color:'oklch(0.5 0.02 250)'}}>+Rp {(a.price/1000).toFixed(0)}rb</div>
+                    </div>
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                    <button onClick={()=>setAddons({...addons,[a.key]:Math.max(0,addons[a.key]-1)})} style={{width:28,height:28,borderRadius:'50%',background:'oklch(0.22 0.025 245)',border:'1px solid oklch(0.3 0.025 245)',color:'oklch(0.75 0.02 250)',cursor:'pointer',fontSize:16,display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>−</button>
+                    <span style={{fontFamily:'Space Grotesk',fontWeight:700,width:20,textAlign:'center',fontSize:15}}>{addons[a.key]}</span>
+                    <button onClick={()=>setAddons({...addons,[a.key]:addons[a.key]+1})} style={{width:28,height:28,borderRadius:'50%',background:'oklch(0.88 0.26 128 / 0.12)',border:'1px solid oklch(0.88 0.26 128 / 0.3)',color:'oklch(0.88 0.26 128)',cursor:'pointer',fontSize:16,display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>+</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Price breakdown */}
+            <div style={{background:'oklch(0.16 0.025 245)',border:'1px solid oklch(0.22 0.025 245)',borderRadius:14,padding:16,marginBottom:16}}>
+              {[[`Sewa ${court.name} (1 jam)`,`Rp ${court.price.toLocaleString('id-ID')}`],['Biaya layanan','Rp 2.000'],...addonItems.filter(a=>addons[a.key]>0).map(a=>[`${a.label} ×${addons[a.key]}`,`Rp ${(a.price*addons[a.key]).toLocaleString('id-ID')}`])].map(([l,v])=>(
+                <div key={l} style={{display:'flex',justifyContent:'space-between',fontSize:13,color:'oklch(0.65 0.02 250)',marginBottom:8}}><span>{l}</span><span>{v}</span></div>
+              ))}
+              <div style={{borderTop:'1px solid oklch(0.22 0.025 245)',paddingTop:12,display:'flex',justifyContent:'space-between',fontFamily:'Space Grotesk',fontWeight:700,fontSize:18}}>
+                <span>Total</span><span style={{color:'oklch(0.88 0.26 128)'}}>Rp {subtotal.toLocaleString('id-ID')}</span>
+              </div>
+            </div>
+
+            <button onClick={()=>{if(validateForm())setStep('payment');}} style={{width:'100%',background:'oklch(0.88 0.26 128)',color:'oklch(0.13 0.05 128)',border:'none',borderRadius:14,padding:16,fontFamily:'Space Grotesk',fontSize:15,fontWeight:700,cursor:'pointer',boxShadow:'0 0 30px oklch(0.88 0.26 128 / 0.3)',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+              Lanjut ke Pembayaran <Ico.arrow/>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // STEP: SCHEDULE
+  return(
+    <>
+      <div style={{padding:'18px 32px 14px',borderBottom:'1px solid oklch(0.22 0.025 245)',flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}>
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>
+            <div style={{fontFamily:'Space Grotesk',fontSize:18,fontWeight:700,letterSpacing:'-0.5px'}}>Pilih Jadwal & Lapangan</div>
+            <StepIndicator current={0} steps={stepLabels}/>
+          </div>
+          <button onClick={onClose} style={{background:'oklch(0.2 0.025 245)',border:'1px solid oklch(0.28 0.025 245)',borderRadius:10,width:38,height:38,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'oklch(0.7 0.02 250)'}}><Ico.close/></button>
+        </div>
+        <div style={{display:'flex',gap:8,overflowX:'auto',paddingBottom:4}}>
+          {DAYS.map((d,i)=>{
+            const a=selDay===i;
+            return<button key={i} onClick={()=>{setSelDay(i);setSelSlot(null);}} style={{flexShrink:0,background:a?'oklch(0.88 0.26 128)':'oklch(0.18 0.025 245)',border:a?'none':'1px solid oklch(0.28 0.025 245)',borderRadius:12,padding:'9px 14px',cursor:'pointer',textAlign:'center',minWidth:68,transition:'all 0.15s'}}>
+              <div style={{fontSize:10,fontWeight:600,letterSpacing:'0.5px',color:a?'oklch(0.2 0.05 128)':'oklch(0.55 0.02 250)',textTransform:'uppercase',marginBottom:2}}>{d.label}</div>
+              <div style={{fontFamily:'Space Grotesk',fontSize:19,fontWeight:700,color:a?'oklch(0.15 0.05 128)':'oklch(0.96 0.005 250)',lineHeight:1}}>{d.date}</div>
+              <div style={{fontSize:10,color:a?'oklch(0.25 0.06 128)':'oklch(0.5 0.02 250)',marginTop:1}}>{d.month}</div>
+            </button>;
+          })}
+        </div>
+      </div>
+      <div style={{display:'flex',flex:1,overflow:'hidden'}}>
+        <div style={{width:200,flexShrink:0,borderRight:'1px solid oklch(0.22 0.025 245)',padding:12,overflowY:'auto'}}>
+          <div style={{fontSize:10,color:'oklch(0.5 0.02 250)',fontWeight:600,letterSpacing:'1px',textTransform:'uppercase',marginBottom:10,paddingLeft:4}}>Lapangan</div>
+          {COURTS.map(c=>{
+            const a=selCourt===c.id;
+            const cv=genSlots(c.id,selDay).filter(s=>s.status==='available').length;
+            return<button key={c.id} onClick={()=>{setSelCourt(c.id);setSelSlot(null);}} style={{width:'100%',textAlign:'left',background:a?'oklch(0.88 0.26 128 / 0.1)':'transparent',border:a?'1px solid oklch(0.88 0.26 128 / 0.3)':'1px solid transparent',borderRadius:10,padding:'10px 12px',cursor:'pointer',marginBottom:6,transition:'all 0.15s'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:3}}>
+                <span style={{fontFamily:'Space Grotesk',fontWeight:600,fontSize:13,color:a?'oklch(0.88 0.26 128)':'oklch(0.96 0.005 250)'}}>{c.name}</span>
+                <span style={{fontSize:10,fontWeight:600,color:cv>4?'oklch(0.88 0.26 128)':'oklch(0.65 0.18 20)',background:cv>4?'oklch(0.88 0.26 128 / 0.1)':'oklch(0.65 0.18 20 / 0.1)',padding:'2px 7px',borderRadius:100}}>{cv}</span>
+              </div>
+              <div style={{fontSize:11,color:'oklch(0.5 0.02 250)'}}>{c.type}</div>
+              <div style={{fontSize:11,color:'oklch(0.55 0.02 250)',marginTop:2}}>Rp {(c.price/1000).toFixed(0)}rb/jam</div>
+            </button>;
+          })}
+        </div>
+        <div style={{flex:1,padding:'16px 20px',overflowY:'auto'}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+            <div>
+              <span style={{fontFamily:'Space Grotesk',fontWeight:600,fontSize:14}}>{court.name}</span>
+              <span style={{fontSize:12,color:'oklch(0.55 0.02 250)',marginLeft:8}}>{day.label}, {day.date} {day.month} 2026</span>
+            </div>
+            <div style={{display:'flex',gap:10,fontSize:11,color:'oklch(0.55 0.02 250)'}}>
+              {[['oklch(0.88 0.26 128 / 0.25)','Tersedia'],['oklch(0.25 0.02 245)','Terisi'],['oklch(0.82 0.18 80 / 0.2)','Maint.']].map(([bg,l])=>(
+                <span key={l} style={{display:'flex',alignItems:'center',gap:4}}><span style={{display:'inline-block',width:9,height:9,borderRadius:2,background:bg}}></span>{l}</span>
+              ))}
+            </div>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8}}>
+            {slots.map(slot=>{
+              const isA=slot.status==='available',isSel=selSlot?.time===slot.time;
+              let bg,border,color,cursor;
+              if(isSel){bg='oklch(0.88 0.26 128)';border='none';color='oklch(0.15 0.05 128)';cursor='pointer';}
+              else if(isA){bg='oklch(0.88 0.26 128 / 0.08)';border='1px solid oklch(0.88 0.26 128 / 0.35)';color='oklch(0.88 0.26 128)';cursor='pointer';}
+              else if(slot.status==='taken'){bg='oklch(0.17 0.02 245)';border='1px solid oklch(0.23 0.02 245)';color='oklch(0.4 0.02 250)';cursor='not-allowed';}
+              else{bg='oklch(0.82 0.18 80 / 0.08)';border='1px solid oklch(0.82 0.18 80 / 0.25)';color='oklch(0.82 0.18 80)';cursor='not-allowed';}
+              return<button key={slot.time} onClick={()=>isA&&setSelSlot(isSel?null:slot)} style={{background:bg,border,borderRadius:10,padding:'12px 8px',cursor,textAlign:'center',transition:'all 0.15s'}}>
+                <div style={{fontFamily:'Space Grotesk',fontWeight:700,fontSize:14,color}}>{slot.time}</div>
+                <div style={{fontSize:10,marginTop:2,color,opacity:0.8}}>{isA?`Rp ${(court.price/1000).toFixed(0)}rb`:slot.status==='taken'?'Terisi':'Maint.'}</div>
+                {isSel&&<div style={{fontSize:10,color:'oklch(0.25 0.06 128)',fontWeight:700,marginTop:1}}>✓</div>}
+              </button>;
+            })}
+          </div>
+          <div style={{marginTop:16,padding:'12px 16px',background:'oklch(0.16 0.025 245)',borderRadius:12,border:'1px solid oklch(0.22 0.025 245)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <div style={{fontSize:13,color:'oklch(0.6 0.02 250)'}}><span style={{color:'oklch(0.88 0.26 128)',fontWeight:600}}>{avail} slot</span> tersedia · Member: <span style={{color:'oklch(0.72 0.18 200)',fontWeight:600}}>Rp {(court.memberPrice/1000).toFixed(0)}rb/jam</span></div>
+            {selSlot
+              ?<button onClick={()=>setStep('form')} style={{background:'oklch(0.88 0.26 128)',color:'oklch(0.15 0.05 128)',border:'none',borderRadius:100,padding:'9px 22px',fontWeight:700,fontFamily:'Space Grotesk',fontSize:13,cursor:'pointer',display:'flex',alignItems:'center',gap:6}}>Isi Data Pemesan <Ico.arrow/></button>
+              :<div style={{fontSize:12,color:'oklch(0.45 0.02 250)'}}>Pilih slot waktu untuk lanjut</div>
+            }
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ── MEMBERSHIP PANEL ─────────────────────────────────────
+function MembershipContent({onClose}) {
+  const [sel,setSel]=useState(1);
+  const plans=[
+    {id:0,label:'3 Bulan',price:5000000,savings:'Hemat 15%',color:'oklch(0.72 0.18 200)',bg:'oklch(0.72 0.18 200 / 0.08)',border:'oklch(0.72 0.18 200 / 0.3)',sessions:36,bonus:3,desc:'Cocok untuk pemain aktif yang ingin fleksibilitas.',perks:['Harga member semua lapangan','Akses matchmaking terverifikasi','Priority booking','3 sesi bonus gratis']},
+    {id:1,label:'6 Bulan',price:10000000,savings:'Hemat 22%',color:'oklch(0.88 0.26 128)',bg:'oklch(0.88 0.26 128 / 0.08)',border:'oklch(0.88 0.26 128 / 0.4)',sessions:72,bonus:7,desc:'Pilihan terpopuler. Nilai terbaik untuk pemain reguler.',perks:['Semua benefit 3 bulan','Akses Lapangan E & F','7 sesi bonus gratis','Sewa raket gratis 10x']},
+    {id:2,label:'1 Tahun',price:14000000,savings:'Hemat 38%',color:'oklch(0.82 0.18 75)',bg:'oklch(0.82 0.18 75 / 0.08)',border:'oklch(0.82 0.18 75 / 0.4)',sessions:144,bonus:15,desc:'Komitmen penuh, harga terbaik, benefit terlengkap.',perks:['Semua benefit 6 bulan','VIP Lounge akses','15 sesi bonus gratis','Pelatihan privat 2x/bulan','Guest pass 4x/tahun']},
+  ];
+  const p=plans[sel];
+  return(
+    <div style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
+      <div style={{padding:'22px 32px 18px',borderBottom:'1px solid oklch(0.22 0.025 245)',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div><div style={{fontFamily:'Space Grotesk',fontSize:20,fontWeight:700,letterSpacing:'-0.5px'}}>Paket Membership PadelKu</div><div style={{fontSize:13,color:'oklch(0.6 0.02 250)',marginTop:3}}>Harga member, bonus sesi, dan akses eksklusif</div></div>
+        <button onClick={onClose} style={{background:'oklch(0.2 0.025 245)',border:'1px solid oklch(0.28 0.025 245)',borderRadius:10,width:40,height:40,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'oklch(0.7 0.02 250)'}}><Ico.close/></button>
+      </div>
+      <div style={{overflowY:'auto',flex:1,padding:'24px 32px'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16,marginBottom:28}}>
+          {plans.map((plan,i)=>{
+            const active=sel===i;
+            return(
+              <button key={plan.id} onClick={()=>setSel(i)} style={{background:active?plan.bg:'oklch(0.16 0.025 245)',border:`1.5px solid ${active?plan.border:'oklch(0.22 0.025 245)'}`,borderRadius:20,padding:22,cursor:'pointer',textAlign:'left',transition:'all 0.2s',position:'relative',overflow:'hidden'}}>
+                {i===1&&<div style={{position:'absolute',top:10,right:10,background:'oklch(0.88 0.26 128)',color:'oklch(0.13 0.05 128)',fontSize:9,fontWeight:700,padding:'3px 8px',borderRadius:100}}>TERPOPULER</div>}
+                {i===2&&<div style={{position:'absolute',top:10,right:10,background:'oklch(0.82 0.18 75)',color:'oklch(0.13 0.04 75)',fontSize:9,fontWeight:700,padding:'3px 8px',borderRadius:100}}>BEST VALUE</div>}
+                <div style={{fontSize:11,fontWeight:600,color:active?plan.color:'oklch(0.55 0.02 250)',textTransform:'uppercase',letterSpacing:'1px',marginBottom:10}}>{plan.label}</div>
+                <div style={{fontFamily:'Space Grotesk',fontSize:28,fontWeight:700,color:active?plan.color:'oklch(0.96 0.005 250)',letterSpacing:'-1px',lineHeight:1}}>Rp {(plan.price/1000000).toFixed(0)} <span style={{fontSize:13,fontWeight:400,color:'oklch(0.5 0.02 250)'}}>juta</span></div>
+                <div style={{fontSize:11,color:'oklch(0.55 0.02 250)',marginTop:6,marginBottom:10}}>≈ Rp {(plan.price/1000000/parseInt(plan.label)).toFixed(1)}jt/bln</div>
+                <div style={{fontSize:11,fontWeight:600,color:active?plan.color:'oklch(0.55 0.02 250)',background:active?plan.bg:'oklch(0.2 0.025 245)',padding:'3px 10px',borderRadius:100,display:'inline-block'}}>{plan.savings}</div>
+                <div style={{marginTop:12,fontSize:12,color:'oklch(0.55 0.02 250)',lineHeight:1.5}}>{plan.desc}</div>
+              </button>
+            );
+          })}
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24}}>
+          <div>
+            <div style={{fontFamily:'Space Grotesk',fontSize:14,fontWeight:600,marginBottom:14,color:p.color}}>Yang Kamu Dapatkan</div>
+            {p.perks.map((perk,i)=>(
+              <div key={i} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 14px',background:'oklch(0.16 0.025 245)',borderRadius:10,border:'1px solid oklch(0.22 0.025 245)',fontSize:13,marginBottom:8}}>
+                <div style={{width:20,height:20,borderRadius:'50%',background:p.bg,border:`1px solid ${p.border}`,display:'flex',alignItems:'center',justifyContent:'center',color:p.color,flexShrink:0,fontSize:11,fontWeight:700}}>✓</div>
+                {perk}
+              </div>
+            ))}
+          </div>
+          <div>
+            <div style={{fontFamily:'Space Grotesk',fontSize:14,fontWeight:600,marginBottom:14}}>Ringkasan Paket</div>
+            <div style={{background:'oklch(0.16 0.025 245)',border:'1px solid oklch(0.22 0.025 245)',borderRadius:16,padding:18,marginBottom:16}}>
+              {[['Total Sesi',`${p.sessions} sesi`],['Sesi Bonus',`${p.bonus} sesi gratis`],['Harga/Sesi',`≈ Rp ${Math.round(p.price/p.sessions/1000)}rb`],['Durasi',p.label]].map(([l,v])=>(
+                <div key={l} style={{display:'flex',justifyContent:'space-between',fontSize:13,marginBottom:12,paddingBottom:12,borderBottom:'1px solid oklch(0.2 0.025 245)'}}>
+                  <span style={{color:'oklch(0.6 0.02 250)'}}>{l}</span><span style={{fontWeight:600,color:p.color}}>{v}</span>
+                </div>
+              ))}
+              <div style={{display:'flex',justifyContent:'space-between',fontFamily:'Space Grotesk',fontWeight:700,fontSize:18}}><span>Total</span><span style={{color:p.color}}>Rp {p.price.toLocaleString('id-ID')}</span></div>
+            </div>
+            <div style={{background:p.bg,border:`1px solid ${p.border}`,borderRadius:14,padding:14,marginBottom:14}}>
+              <div style={{fontSize:10,fontWeight:600,color:p.color,textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:8}}>Loyalty Tracker · Beli 10, Gratis 1</div>
+              <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>
+                {Array.from({length:11},(_,i)=>(
+                  <div key={i} style={{width:26,height:26,borderRadius:6,background:i<7?p.border:'oklch(0.22 0.025 245)',border:`1px solid ${i<7?p.color:'oklch(0.3 0.025 245)'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:i===10?14:9,color:i<7?p.color:'oklch(0.4 0.02 250)',fontWeight:700}}>{i===10?'🎁':i<7?'✓':''}</div>
+                ))}
+              </div>
+              <div style={{fontSize:11,color:p.color,marginTop:8,opacity:0.8}}>7/10 sesi · 3 lagi dapat bonus!</div>
+            </div>
+            <button style={{width:'100%',background:p.color,color:'oklch(0.13 0.05 130)',border:'none',borderRadius:14,padding:14,fontFamily:'Space Grotesk',fontSize:14,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+              Beli Paket {p.label} <Ico.arrow/>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── COURTS PANEL ─────────────────────────────────────────
+function CourtsContent({onClose}) {
+  const [sel,setSel]=useState(null);
+  const CourtViz=({court})=>{
+    const c=court.color;
+    return(
+      <div style={{width:'100%',aspectRatio:'16/9',borderRadius:14,overflow:'hidden',position:'relative',background:'linear-gradient(135deg,oklch(0.13 0.04 160),oklch(0.10 0.02 230))'}}>
+        <svg viewBox="0 0 400 225" style={{width:'100%',height:'100%',position:'absolute',inset:0}}>
+          <defs>
+            <radialGradient id={`rg${court.id}`} cx="50%" cy="50%" r="60%"><stop offset="0%" stopColor={c} stopOpacity="0.15"/><stop offset="100%" stopColor={c} stopOpacity="0"/></radialGradient>
+            <filter id={`fg${court.id}`}><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <rect width="400" height="225" fill={`url(#rg${court.id})`}/>
+          <rect x="40" y="18" width="320" height="189" rx="3" fill="none" stroke={c} strokeWidth="1" strokeOpacity="0.3"/>
+          <rect x="60" y="30" width="280" height="165" fill={`${c}08`} stroke={c} strokeWidth="1.5" strokeOpacity="0.7" rx="1"/>
+          <line x1="200" y1="30" x2="200" y2="195" stroke={court.id==='F'?'#fbbf24':c} strokeWidth="2.5" strokeOpacity="0.9" filter={`url(#fg${court.id})`}/>
+          <circle cx="60" cy="112" r="4" fill={c} opacity="0.8" filter={`url(#fg${court.id})`}/>
+          <circle cx="340" cy="112" r="4" fill={c} opacity="0.8" filter={`url(#fg${court.id})`}/>
+          <line x1="60" y1="78" x2="340" y2="78" stroke={c} strokeWidth="1" strokeOpacity="0.5"/>
+          <line x1="60" y1="147" x2="340" y2="147" stroke={c} strokeWidth="1" strokeOpacity="0.5"/>
+          {[[60,30],[340,30],[60,195],[340,195]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r="3" fill={c} opacity="0.9" filter={`url(#fg${court.id})`}/>)}
+          {court.id==='F'&&[[130,8],[200,8],[270,8]].map(([x,y],i)=><ellipse key={i} cx={x} cy={y} rx="20" ry="6" fill="#fbbf24" opacity="0.6" filter={`url(#fg${court.id})`}/>)}
+          {court.status==='maintenance'&&<><rect width="400" height="225" fill="oklch(0 0 0 / 0.5)"/><text x="200" y="105" textAnchor="middle" fill="#fbbf24" fontSize="14" fontFamily="Space Grotesk" fontWeight="600">⚙ Maintenance</text><text x="200" y="125" textAnchor="middle" fill="oklch(0.6 0.02 250)" fontSize="10" fontFamily="DM Sans">Tersedia dalam 2 hari</text></>}
+          {court.id==='F'&&<><rect x="280" y="12" width="60" height="22" rx="5" fill="oklch(0.82 0.18 75 / 0.3)" stroke="#fbbf24" strokeWidth="0.8"/><text x="310" y="27" textAnchor="middle" fill="#fbbf24" fontSize="10" fontFamily="Space Grotesk" fontWeight="700">VIP SUITE</text></>}
+        </svg>
+        <div style={{position:'absolute',top:10,left:10,display:'flex',alignItems:'center',gap:5,background:'oklch(0 0 0 / 0.55)',backdropFilter:'blur(8px)',border:`1px solid ${c}44`,borderRadius:100,padding:'4px 10px',fontSize:11,fontWeight:600,color:court.status==='maintenance'?'#fbbf24':c}}>
+          <div style={{width:6,height:6,borderRadius:'50%',background:court.status==='maintenance'?'#fbbf24':c,animation:court.status!=='maintenance'?'pulse 2s infinite':'none'}}></div>
+          {court.status==='maintenance'?'Maintenance':'Tersedia'}
+        </div>
+      </div>
+    );
+  };
+  return(
+    <div style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
+      <div style={{padding:'22px 32px 18px',borderBottom:'1px solid oklch(0.22 0.025 245)',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div><div style={{fontFamily:'Space Grotesk',fontSize:20,fontWeight:700,letterSpacing:'-0.5px'}}>Lapangan Padel</div><div style={{fontSize:13,color:'oklch(0.6 0.02 250)',marginTop:3}}>6 lapangan premium · Indoor & Outdoor · Kemang, Jakarta</div></div>
+        <button onClick={onClose} style={{background:'oklch(0.2 0.025 245)',border:'1px solid oklch(0.28 0.025 245)',borderRadius:10,width:40,height:40,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'oklch(0.7 0.02 250)'}}><Ico.close/></button>
+      </div>
+      <div style={{overflowY:'auto',flex:1,padding:'22px 32px'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:18}}>
+          {COURTS.map(court=>(
+            <div key={court.id} onClick={()=>setSel(sel===court.id?null:court.id)} style={{cursor:'pointer',background:'oklch(0.15 0.022 248)',border:`1px solid ${sel===court.id?court.color+'55':'oklch(0.22 0.025 245)'}`,borderRadius:18,overflow:'hidden',transition:'all 0.2s',boxShadow:sel===court.id?`0 0 24px ${court.color}18`:'none'}}>
+              <CourtViz court={court}/>
+              <div style={{padding:'14px 18px'}}>
+                <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:6}}>
+                  <div><div style={{fontFamily:'Space Grotesk',fontWeight:700,fontSize:15,color:court.id==='F'?'#fbbf24':'oklch(0.96 0.005 250)'}}>{court.name}{court.id==='F'&&' ★'}</div><div style={{fontSize:12,color:'oklch(0.55 0.02 250)',marginTop:1}}>{court.type} · {court.surface}</div></div>
+                  <div style={{textAlign:'right'}}><div style={{fontFamily:'Space Grotesk',fontWeight:700,fontSize:14,color:court.color}}>Rp {(court.price/1000).toFixed(0)}rb<span style={{fontSize:10,fontWeight:400,color:'oklch(0.5 0.02 250)'}}>/jam</span></div><div style={{fontSize:11,color:'oklch(0.5 0.02 250)'}}>Member: Rp {(court.memberPrice/1000).toFixed(0)}rb</div></div>
+                </div>
+                {sel===court.id&&(
+                  <div style={{marginTop:8,paddingTop:12,borderTop:'1px solid oklch(0.22 0.025 245)'}}>
+                    <div style={{fontSize:12,color:'oklch(0.6 0.02 250)',lineHeight:1.6,marginBottom:10}}>{court.desc}</div>
+                    <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:12}}>
+                      {court.features.map(f=><span key={f} style={{fontSize:11,padding:'3px 10px',borderRadius:100,background:`${court.color}15`,border:`1px solid ${court.color}35`,color:court.color}}>{f}</span>)}
+                    </div>
+                    {court.status==='available'&&<button onClick={e=>{e.stopPropagation();window.openPanel('schedule');}} style={{background:court.color,color:'oklch(0.13 0.04 130)',border:'none',borderRadius:100,padding:'9px 22px',fontFamily:'Space Grotesk',fontWeight:700,fontSize:13,cursor:'pointer',display:'flex',alignItems:'center',gap:6}}>Booking Sekarang <Ico.arrow/></button>}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── MATCHMAKING PANEL ─────────────────────────────────────
+function MatchmakingContent({onClose}) {
+  const [filter,setFilter]=useState('All');
+  const [challenged,setChallenged]=useState(null);
+  const sorted=[...PLAYERS].sort((a,b)=>b.wins-a.wins);
+  const filtered=filter==='All'?sorted:sorted.filter(p=>p.level===filter);
+  const lc=l=>l==='Advanced'?'oklch(0.88 0.26 128)':l==='Intermediate'?'oklch(0.72 0.18 200)':'oklch(0.65 0.18 20)';
+
+  if(challenged) return(
+    <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',padding:40}}>
+      <div style={{textAlign:'center',maxWidth:380}}>
+        <div style={{fontFamily:'Space Grotesk',fontSize:48,marginBottom:16}}>⚡</div>
+        <div style={{fontFamily:'Space Grotesk',fontSize:22,fontWeight:700,letterSpacing:'-0.5px',marginBottom:8}}>Tantangan Terkirim!</div>
+        <div style={{fontSize:14,color:'oklch(0.6 0.02 250)',lineHeight:1.6,marginBottom:28}}>Kamu menantang <strong style={{color:'oklch(0.88 0.26 128)'}}>{challenged.name}</strong>.<br/>Menunggu konfirmasi dari lawan main.</div>
+        <div style={{display:'flex',gap:12,justifyContent:'center'}}>
+          <button onClick={()=>setChallenged(null)} style={{background:'oklch(0.2 0.025 245)',color:'oklch(0.7 0.02 250)',border:'1px solid oklch(0.28 0.025 245)',borderRadius:100,padding:'11px 24px',fontSize:13,cursor:'pointer'}}>Kembali</button>
+          <button style={{background:'oklch(0.07 0.04 145 / 0.2)',color:'oklch(0.75 0.2 145)',border:'1px solid oklch(0.3 0.15 145 / 0.3)',borderRadius:100,padding:'11px 22px',fontSize:13,cursor:'pointer',display:'flex',alignItems:'center',gap:7}}><Ico.wa/> Chat WhatsApp</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const top3=sorted.slice(0,3);
+  return(
+    <div style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
+      <div style={{padding:'22px 32px 18px',borderBottom:'1px solid oklch(0.22 0.025 245)',flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}}>
+          <div><div style={{fontFamily:'Space Grotesk',fontSize:20,fontWeight:700,letterSpacing:'-0.5px'}}>Matchmaking</div><div style={{fontSize:13,color:'oklch(0.6 0.02 250)',marginTop:3}}>Temukan lawan setara berdasarkan rekam kemenangan</div></div>
+          <button onClick={onClose} style={{background:'oklch(0.2 0.025 245)',border:'1px solid oklch(0.28 0.025 245)',borderRadius:10,width:40,height:40,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'oklch(0.7 0.02 250)'}}><Ico.close/></button>
+        </div>
+        <div style={{display:'flex',gap:8,marginBottom:16}}>
+          {top3.map((p,i)=>(
+            <div key={p.id} style={{flex:1,background:i===0?'oklch(0.82 0.18 75 / 0.1)':'oklch(0.16 0.025 245)',border:`1px solid ${i===0?'oklch(0.82 0.18 75 / 0.3)':'oklch(0.22 0.025 245)'}`,borderRadius:12,padding:'8px 12px',display:'flex',alignItems:'center',gap:8}}>
+              <span style={{fontSize:16}}>{i===0?'🥇':i===1?'🥈':'🥉'}</span>
+              <div style={{flex:1,minWidth:0}}><div style={{fontFamily:'Space Grotesk',fontWeight:600,fontSize:12,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',color:i===0?'oklch(0.82 0.18 75)':'oklch(0.96 0.005 250)'}}>{p.name}</div><div style={{fontSize:11,color:'oklch(0.5 0.02 250)'}}>{p.wins}W · {p.winRate}%</div></div>
+            </div>
+          ))}
+        </div>
+        <div style={{display:'flex',gap:6}}>
+          {['All','Beginner','Intermediate','Advanced'].map(l=>(
+            <button key={l} onClick={()=>setFilter(l)} style={{background:filter===l?'oklch(0.88 0.26 128)':'oklch(0.18 0.025 245)',border:filter===l?'none':'1px solid oklch(0.28 0.025 245)',borderRadius:100,padding:'6px 16px',fontSize:12,fontWeight:600,color:filter===l?'oklch(0.15 0.05 128)':'oklch(0.65 0.02 250)',cursor:'pointer',transition:'all 0.15s'}}>{l}</button>
+          ))}
+        </div>
+      </div>
+      <div style={{overflowY:'auto',flex:1,padding:'14px 24px'}}>
+        {filtered.map(player=>{
+          const rank=sorted.indexOf(player)+1;
+          const c=lc(player.level);
+          return(
+            <div key={player.id} style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px',borderRadius:12,marginBottom:8,background:'oklch(0.15 0.022 248)',border:'1px solid oklch(0.22 0.025 245)',transition:'border-color 0.15s'}}
+              onMouseEnter={e=>e.currentTarget.style.borderColor='oklch(0.3 0.025 245)'}
+              onMouseLeave={e=>e.currentTarget.style.borderColor='oklch(0.22 0.025 245)'}
+            >
+              <div style={{width:26,textAlign:'center',fontFamily:'Space Grotesk',fontWeight:700,fontSize:13,color:rank<=3?'oklch(0.82 0.18 75)':'oklch(0.45 0.02 250)',flexShrink:0}}>#{rank}</div>
+              <div style={{width:42,height:42,borderRadius:'50%',background:`${c}15`,border:`1.5px solid ${c}40`,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Space Grotesk',fontWeight:700,fontSize:13,color:c,flexShrink:0}}>{player.avatar}</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:2}}>
+                  <span style={{fontFamily:'Space Grotesk',fontWeight:600,fontSize:14}}>{player.name}</span>
+                  {player.badge&&<span style={{fontSize:13}}>{player.badge}</span>}
+                  {player.streak>=5&&<span style={{fontSize:10,background:'oklch(0.65 0.18 20 / 0.15)',color:'oklch(0.65 0.18 20)',border:'1px solid oklch(0.65 0.18 20 / 0.3)',padding:'2px 7px',borderRadius:100,fontWeight:600}}>🔥 {player.streak}</span>}
+                </div>
+                <div style={{display:'flex',gap:6,fontSize:12,color:'oklch(0.55 0.02 250)',alignItems:'center'}}>
+                  <span style={{background:`${c}12`,border:`1px solid ${c}30`,color:c,padding:'1px 8px',borderRadius:100,fontWeight:600,fontSize:11}}>{player.level}</span>
+                  <span>{player.available}</span>
+                </div>
+              </div>
+              <div style={{display:'flex',gap:14,flexShrink:0}}>
+                <div style={{textAlign:'center'}}><div style={{fontFamily:'Space Grotesk',fontWeight:700,fontSize:15,color:'oklch(0.88 0.26 128)'}}>{player.wins}</div><div style={{fontSize:10,color:'oklch(0.5 0.02 250)'}}>Menang</div></div>
+                <div style={{textAlign:'center'}}><div style={{fontFamily:'Space Grotesk',fontWeight:700,fontSize:15,color:'oklch(0.65 0.18 20)'}}>{player.losses}</div><div style={{fontSize:10,color:'oklch(0.5 0.02 250)'}}>Kalah</div></div>
+                <div style={{textAlign:'center'}}><div style={{fontFamily:'Space Grotesk',fontWeight:700,fontSize:15,color:c}}>{player.winRate}%</div><div style={{fontSize:10,color:'oklch(0.5 0.02 250)'}}>WR</div></div>
+              </div>
+              <div style={{width:76,flexShrink:0}}>
+                <div style={{height:3,borderRadius:2,background:'oklch(0.22 0.025 245)',overflow:'hidden',marginBottom:6}}><div style={{height:'100%',width:`${player.winRate}%`,background:c,borderRadius:2}}></div></div>
+                <button onClick={()=>setChallenged(player)} style={{width:'100%',background:`${c}18`,border:`1px solid ${c}35`,borderRadius:8,padding:'6px 0',fontSize:12,fontWeight:600,color:c,cursor:'pointer',fontFamily:'Space Grotesk'}}>Tantang ⚡</button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── ROOT ─────────────────────────────────────────────────
+function App() {
+  const [panel,setPanel]=useState(null);
+  useEffect(()=>{window.openPanel=t=>setPanel(t);return()=>{delete window.openPanel;};},[]);
+  const close=()=>setPanel(null);
+  if(!panel) return null;
+  return(
+    <SlidePanel onClose={close} maxWidth={panel==='matchmaking'?'960px':'920px'}>
+      {panel==='schedule'?<ScheduleContent/>:panel==='membership'?<MembershipContent/>:panel==='courts'?<CourtsContent/>:panel==='matchmaking'?<MatchmakingContent/>:<div/>}
+    </SlidePanel>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app-root')).render(<App/>);
+</script>
+</body>
+</html>
