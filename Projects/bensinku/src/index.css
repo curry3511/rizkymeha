@@ -1,0 +1,76 @@
+:root {
+  --bg: #EFEAE0;
+  --ink: #171614;
+  --ink-dim: rgba(23,22,20,0.66);
+  --ink-mute: rgba(23,22,20,0.42);
+  --ink-faint: rgba(23,22,20,0.18);
+  --surface: #FFFDF7;
+  --stroke: rgba(23,22,20,0.10);
+  --stroke-strong: rgba(23,22,20,0.18);
+  --accent: #C8E441;
+  --accent-deep: #8FAA1F;
+  --accent-ink: #0F1A02;
+  --warn: #E8924B;
+  --warn-soft: #FBE7D2;
+  --good: #3F8556;
+  --good-soft: #DDE8DF;
+  --info: #6B8DDB;
+  --tabbar-h: 78px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  font-family: 'Inter Tight', system-ui, sans-serif;
+  background: #1a1a18;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-feature-settings: 'tnum' 1; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; padding: 0; color: inherit; }
+#root { width: 100vw; height: 100vh; }
+
+.stage {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(1200px 600px at 50% 20%, #2a2a25 0%, #131311 70%);
+}
+.stage.bare { background: var(--bg); }
+
+.scroll-area {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-area::-webkit-scrollbar { display: none; }
+.hide-scroll::-webkit-scrollbar { display: none; }
+.hide-scroll { scrollbar-width: none; }
+
+@keyframes sheetIn {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0%); }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pulse {
+  0%,100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+@keyframes scan {
+  0%   { transform: translateY(0%); opacity: 0.0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+.screen-fade { animation: none; }
